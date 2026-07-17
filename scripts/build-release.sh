@@ -13,6 +13,8 @@ RELEASE_VERSION="$(tr -d '[:space:]' < "${ROOT_DIR}/VERSION")"
 PACKAGE_LIST="${ROOT_DIR}/config/release-packages.txt"
 RUNTIME_VERSIONS="${ROOT_DIR}/config/runtime-versions.env"
 ARCH="aarch64_cortex-a53"
+EXPECTED_KERNEL="6.18.38"
+EXPECTED_KERNEL_ABI="93edd57b5daa2a685ba2b251f368f171"
 
 # shellcheck source=../config/runtime-versions.env
 source "${RUNTIME_VERSIONS}"
@@ -115,9 +117,19 @@ base_revision="$(sed -n "s/^DISTRIB_REVISION=['\"]\{0,1\}\([^'\"]*\).*/\1/p" \
 	--repositories-file /dev/null \
 	--repository "${REPO_DIR}/packages.adb" \
 	add --simulate \
+	dnsmasq-full kmod-nft-socket kmod-nft-tproxy \
 	luci-app-passwall2 luci-i18n-passwall2-zh-cn \
 	xray-core sing-box tcping v2ray-geoip v2ray-geosite v2ray-plugin geoview \
 	> "${BUNDLE}/INSTALL-SIMULATION.txt"
+
+grep -q 'dnsmasq-full' "${BUNDLE}/INSTALL-SIMULATION.txt"
+grep -q 'kmod-nft-socket' "${BUNDLE}/INSTALL-SIMULATION.txt"
+grep -q 'kmod-nft-tproxy' "${BUNDLE}/INSTALL-SIMULATION.txt"
+if grep -Eq '^\([[:space:]]*[0-9]+/[0-9]+\) (Installing|Upgrading) dnsmasq ' \
+	"${BUNDLE}/INSTALL-SIMULATION.txt"; then
+	echo "Offline simulation retained or installed compact dnsmasq." >&2
+	exit 1
+fi
 
 install -m 0755 "${ROOT_DIR}/scripts/install.sh" "${BUNDLE}/install.sh"
 install -m 0755 "${ROOT_DIR}/scripts/uninstall.sh" "${BUNDLE}/uninstall.sh"
@@ -128,10 +140,15 @@ install -m 0644 "${SIGNING_DIR}/public-key.pem" "${BUNDLE}/h5000m-plugins.pem"
 	echo "openwrt_revision=${EXPECTED_REVISION}"
 	echo "target=mediatek/filogic"
 	echo "architecture=${ARCH}"
+	echo "kernel=${EXPECTED_KERNEL}"
+	echo "kernel_abi=${EXPECTED_KERNEL_ABI}"
 	echo "sing_box_version=${SING_BOX_VERSION}"
 	echo "xray_core_version=${XRAY_CORE_VERSION}"
 	echo "package_count=$(find "${REPO_DIR}" -maxdepth 1 -type f -name '*.apk' | wc -l | tr -d ' ')"
 	echo "base_rootfs_validation=passed"
+	echo "passwall2_runtime_prerequisites_included=true"
+	echo "dnsmasq_full_with_nftset_required=true"
+	echo "nft_socket_tproxy_modules_included=true"
 	echo "private_configuration_included=false"
 } > "${BUNDLE}/BUILD-INFO.txt"
 

@@ -1,4 +1,6 @@
 # PassWall2 and runtime components absent from the official H5000M base image.
+dnsmasq
+dnsmasq-full
 geoview
 coreutils
 coreutils-base64
@@ -29,9 +31,18 @@ v2ray-plugin
 xray-core
 
 # These packages must always come from the exact official SDK/kernel ABI.
+kmod-nf-socket
+kmod-nf-tproxy
+kmod-nf-conntrack-netlink
 kmod-inet-diag
 kmod-netlink-diag
 kmod-nft-nat
 kmod-nft-socket
 kmod-nft-tproxy
 kmod-tun
+
+# Explicit userland closure for dnsmasq-full and the nftables kernel modules.
+libnetfilter-conntrack3
+libnfnetlink0
+libnettle8
+libgmp10
