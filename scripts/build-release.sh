@@ -125,7 +125,8 @@ install -m 0644 "${SIGNING_DIR}/public-key.pem" "${BUNDLE}/h5000m-plugins.pem"
 } > "${BUNDLE}/BUILD-INFO.txt"
 
 (cd "${BUNDLE}" && find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS)
-(cd "${DIST_DIR}" && tar -czf "$(basename "${BUNDLE}").tar.gz" "$(basename "${BUNDLE}")")
-sha256sum "${DIST_DIR}/$(basename "${BUNDLE}").tar.gz" > "${DIST_DIR}/$(basename "${BUNDLE}").tar.gz.sha256"
+archive_name="$(basename "${BUNDLE}").tar.gz"
+(cd "${DIST_DIR}" && tar -czf "${archive_name}" "$(basename "${BUNDLE}")")
+(cd "${DIST_DIR}" && sha256sum "${archive_name}" > "${archive_name}.sha256")
 
-echo "Release bundle: ${DIST_DIR}/$(basename "${BUNDLE}").tar.gz"
+echo "Release bundle: ${DIST_DIR}/${archive_name}"
