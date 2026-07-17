@@ -18,6 +18,7 @@ jobs:
           bash -n scripts/build-release.sh
           sh -n scripts/install.sh
           sh -n scripts/uninstall.sh
+          grep -Eq '^PASSWALL2_VERSION=26\.7\.16-r1$' config/runtime-versions.env
           grep -Eq '^SING_BOX_VERSION=1\.13\.14$' config/runtime-versions.env
           grep -Eq '^XRAY_CORE_VERSION=26\.7\.11$' config/runtime-versions.env
       - name: Check for private proxy material

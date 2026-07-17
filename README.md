@@ -4,6 +4,12 @@
 
 本仓库不制作整机固件，也不保存节点、订阅、UUID、服务器地址或其他私人配置。Release 仅包含 PassWall2、中文界面、代理核心及运行所需依赖，避免因大型代理组件进入主固件而扩大启动风险。
 
+## 版本规则
+
+- H5000M 离线集成包使用语义版本，例如 `1.0.0`、`1.0.1`、`1.1.0`。
+- PassWall2、Xray Core、sing-box 等组件保留各自的上游版本号，不再混入集成包版本。
+- Release 标签使用 `v1.0.0`，成品文件使用 `H5000M-PassWall2-1.0.0-<OpenWrt 修订>.tar.gz`。
+
 ## 兼容基线
 
 - 设备：`hiveton,h5000m`
@@ -16,7 +22,7 @@
 
 ## 包含组件
 
-- `luci-app-passwall2` 与简体中文翻译
+- PassWall2 `26.7.16-r1` 与简体中文翻译
 - Xray Core `26.7.11`、sing-box `1.13.14`
 - TCPing、GeoView
 - V2Ray GeoIP、GeoSite、v2ray-plugin
