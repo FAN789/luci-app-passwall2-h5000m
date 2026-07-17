@@ -1,0 +1,27 @@
+name: Check build wrapper
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate shell scripts
+        run: |
+          bash -n scripts/build-release.sh
+          sh -n scripts/install.sh
+          sh -n scripts/uninstall.sh
+      - name: Check for private proxy material
+        run: |
+          if grep -RIE '(vless://|vmess://|trojan://|-----BEGIN [A-Z ]*PRIVATE KEY-----|23\.238\.39\.45|d2506c8f)' \
+            --exclude='check.yml' .; then
+            echo 'Potential private proxy material detected.' >&2
+            exit 1
+          fi

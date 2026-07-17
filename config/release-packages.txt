@@ -1,0 +1,37 @@
+# PassWall2 and runtime components absent from the official H5000M base image.
+geoview
+coreutils
+coreutils-base64
+coreutils-nohup
+coreutils-timeout
+liblua5.1.5
+libuci-lua
+lua
+liblucihttp-lua
+libubus-lua
+luci-lib-ip
+luci-lib-jsonc
+luci-lib-nixio
+luci-lib-base
+ucode-mod-lua
+luci-lua-runtime
+luci-compat
+libyaml
+lyaml
+resolveip
+tcping
+v2ray-geoip
+v2ray-geosite
+luci-app-passwall2
+luci-i18n-passwall2-zh-cn
+sing-box
+v2ray-plugin
+xray-core
+
+# These packages must always come from the exact official SDK/kernel ABI.
+kmod-inet-diag
+kmod-netlink-diag
+kmod-nft-nat
+kmod-nft-socket
+kmod-nft-tproxy
+kmod-tun

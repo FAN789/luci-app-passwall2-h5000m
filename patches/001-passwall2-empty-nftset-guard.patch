@@ -1,0 +1,5 @@
+--- a/luci-app-passwall2/root/usr/share/passwall2/nftables.sh
++++ b/luci-app-passwall2/root/usr/share/passwall2/nftables.sh
+@@ -208 +208 @@ insert_nftset() {
+-	[ $# -gt 0 ] || [ ! -t 0 ] && insert_nftset "$nftset_name" "$timeout_argument_element" "$@"
++	[ "$#" -gt 0 ] && insert_nftset "$nftset_name" "$timeout_argument_element" "$@" # H5000M_EMPTY_NFTSET_GUARD
