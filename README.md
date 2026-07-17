@@ -17,7 +17,7 @@
 ## 包含组件
 
 - `luci-app-passwall2` 与简体中文翻译
-- Xray Core、sing-box
+- Xray Core `26.7.11`、sing-box `1.13.14`
 - TCPing、GeoView
 - V2Ray GeoIP、GeoSite、v2ray-plugin
 - nftables 透明代理及 TUN 所需内核模块

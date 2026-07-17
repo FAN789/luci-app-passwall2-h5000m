@@ -11,7 +11,11 @@ SIGNING_DIR="${H5000M_APK_SIGNING_DIR:-${HOME}/.config/h5000m-apk}"
 EXPECTED_REVISION="$(tr -d '[:space:]' < "${ROOT_DIR}/config/openwrt.revision")"
 RELEASE_VERSION="$(tr -d '[:space:]' < "${ROOT_DIR}/VERSION")"
 PACKAGE_LIST="${ROOT_DIR}/config/release-packages.txt"
+RUNTIME_VERSIONS="${ROOT_DIR}/config/runtime-versions.env"
 ARCH="aarch64_cortex-a53"
+
+# shellcheck source=../config/runtime-versions.env
+source "${RUNTIME_VERSIONS}"
 
 usage() {
 	cat >&2 <<EOF
@@ -24,7 +28,7 @@ EOF
 }
 
 [ -d "${SDK_DIR}" ] && [ -d "${PACKAGE_BUILD_DIR}" ] && [ -f "${BASE_ROOTFS}" ] || usage
-[ -f "${PACKAGE_LIST}" ] || usage
+[ -f "${PACKAGE_LIST}" ] && [ -f "${RUNTIME_VERSIONS}" ] || usage
 
 for key in private-key.pem public-key.pem; do
 	[ -f "${SIGNING_DIR}/${key}" ] || {
@@ -57,7 +61,7 @@ REPO_DIR="${BUNDLE}/repo"
 mkdir -p "${REPO_DIR}"
 
 copy_one_package() {
-	local package="$1" search_root matches source
+	local package="$1" search_root pattern matches source
 	case "${package}" in
 		kmod-*) search_root="${SDK_DIR}/bin/targets/mediatek/filogic/packages" ;;
 		*) search_root="${PACKAGE_BUILD_DIR}/bin/packages/${ARCH}" ;;
@@ -65,7 +69,12 @@ copy_one_package() {
 
 	# OpenWrt package versions begin with a digit. This avoids treating
 	# coreutils-base64 as another build of the coreutils package.
-	mapfile -t matches < <(find "${search_root}" -type f -name "${package}-[0-9]*.apk" -print | sort)
+	case "${package}" in
+		sing-box) pattern="sing-box-${SING_BOX_VERSION}-*.apk" ;;
+		xray-core) pattern="xray-core-${XRAY_CORE_VERSION}-*.apk" ;;
+		*) pattern="${package}-[0-9]*.apk" ;;
+	esac
+	mapfile -t matches < <(find "${search_root}" -type f -name "${pattern}" -print | sort)
 	[ "${#matches[@]}" -eq 1 ] || {
 		echo "Expected one APK for ${package}, found ${#matches[@]} under ${search_root}." >&2
 		exit 1
@@ -119,6 +128,8 @@ install -m 0644 "${SIGNING_DIR}/public-key.pem" "${BUNDLE}/h5000m-plugins.pem"
 	echo "openwrt_revision=${EXPECTED_REVISION}"
 	echo "target=mediatek/filogic"
 	echo "architecture=${ARCH}"
+	echo "sing_box_version=${SING_BOX_VERSION}"
+	echo "xray_core_version=${XRAY_CORE_VERSION}"
 	echo "package_count=$(find "${REPO_DIR}" -maxdepth 1 -type f -name '*.apk' | wc -l | tr -d ' ')"
 	echo "base_rootfs_validation=passed"
 	echo "private_configuration_included=false"

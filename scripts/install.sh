@@ -26,14 +26,16 @@ fi
 	exit 1
 }
 
-install -d -m 0755 /etc/apk/keys
+mkdir -p /etc/apk/keys
+chmod 0755 /etc/apk/keys
 if [ -f /etc/apk/keys/h5000m-plugins.pem ]; then
 	cmp -s "${KEY}" /etc/apk/keys/h5000m-plugins.pem || {
 		echo "Installed H5000M package key does not match this release." >&2
 		exit 1
 	}
 else
-	install -m 0644 "${KEY}" /etc/apk/keys/h5000m-plugins.pem
+	cp "${KEY}" /etc/apk/keys/h5000m-plugins.pem
+	chmod 0644 /etc/apk/keys/h5000m-plugins.pem
 fi
 
 apk add --repositories-file /dev/null --repository "${REPO}" \

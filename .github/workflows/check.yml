@@ -18,6 +18,8 @@ jobs:
           bash -n scripts/build-release.sh
           sh -n scripts/install.sh
           sh -n scripts/uninstall.sh
+          grep -Eq '^SING_BOX_VERSION=1\.13\.14$' config/runtime-versions.env
+          grep -Eq '^XRAY_CORE_VERSION=26\.7\.11$' config/runtime-versions.env
       - name: Check for private proxy material
         run: |
           if grep -RIE '(vless://|vmess://|trojan://|-----BEGIN [A-Z ]*PRIVATE KEY-----|23\.238\.39\.45|d2506c8f)' \
