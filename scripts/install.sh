@@ -85,6 +85,19 @@ apk add --repositories-file /dev/null --repository "${REPO}" \
 	v2ray-plugin \
 	geoview
 
+# The upstream PassWall2 package currently commits dnsmasq.localuse=1 during
+# first installation. Package installation must not silently rewrite the
+# user's DHCP/DNS policy, so restore the exact pre-install file before running
+# prerequisite checks. PassWall2 can still create its runtime DNS fragments
+# when the user later enables and configures the service.
+if [ -f "${DHCP_BACKUP}" ]; then
+	post_install_dhcp_hash="$(sha256sum "${DHCP_CONFIG}" | awk '{print $1}')"
+	if [ "${post_install_dhcp_hash}" != "${dhcp_hash}" ]; then
+		echo "Restoring preserved DHCP configuration after package installation."
+		cp -p "${DHCP_BACKUP}" "${DHCP_CONFIG}"
+	fi
+fi
+
 install_valid=1
 apk info -e dnsmasq-full >/dev/null 2>&1 || install_valid=0
 apk list --installed 'dnsmasq*' 2>/dev/null | grep -q '^dnsmasq-[0-9]' && install_valid=0
